@@ -1,0 +1,70 @@
+[
+  {
+    "chainKey": "abstract-mainnet",
+    "chainId": 2741,
+    "name": "Abstract Mainnet",
+    "networkType": "mainnet",
+    "rpcUrls": [
+      "https://rpc.abstract.example.org",
+      "https://rpc2.abstract.example.org"
+    ],
+    "explorerUrls": [
+      "https://explorer.abstract.example.org"
+    ],
+    "l1ChainId": 1,
+    "l1RpcUrls": [
+      "https://ethereum-rpc.publicnode.com"
+    ],
+    "contracts": {
+      "l1Bridge": "0x0000000000000000000000000000000000000001",
+      "l2Bridge": "0x0000000000000000000000000000000000000002",
+      "l1SharedBridge": "0x0000000000000000000000000000000000000003",
+      "l2SharedBridge": "0x0000000000000000000000000000000000000004",
+      "l1Weth": "0x0000000000000000000000000000000000000005",
+      "l2Weth": "0x0000000000000000000000000000000000000006"
+    },
+    "features": {
+      "deposits": true,
+      "withdrawals": true,
+      "finalizeSupported": true
+    },
+    "ui": {
+      "logoKey": "abstract",
+      "themeKey": "abstract"
+    }
+  },
+  {
+    "chainKey": "atlas-testnet",
+    "chainId": 33033,
+    "name": "Atlas Testnet",
+    "networkType": "testnet",
+    "rpcUrls": [
+      "https://rpc.atlas-testnet.example.org",
+      "https://rpc2.atlas-testnet.example.org"
+    ],
+    "explorerUrls": [
+      "https://explorer.atlas-testnet.example.org"
+    ],
+    "l1ChainId": 11155111,
+    "l1RpcUrls": [
+      "https://ethereum-sepolia.publicnode.com"
+    ],
+    "contracts": {
+      "l1Bridge": "0x0000000000000000000000000000000000000101",
+      "l2Bridge": "0x0000000000000000000000000000000000000102",
+      "l1SharedBridge": "0x0000000000000000000000000000000000000103",
+      "l2SharedBridge": "0x0000000000000000000000000000000000000104",
+      "l1Weth": "0x0000000000000000000000000000000000000105",
+      "l2Weth": "0x0000000000000000000000000000000000000106"
+    },
+    "features": {
+      "deposits": true,
+      "withdrawals": true,
+      "finalizeSupported": true
+    },
+    "ui": {
+      "logoKey": "atlas",
+      "themeKey": "default"
+    }
+  }
+]
