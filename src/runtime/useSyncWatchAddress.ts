@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { utils as ethersUtils } from "ethers";
+import { getAddress } from "ethers";
 import { useAccount } from "./account";
 
 export const useSyncWatchAddress = () => {
@@ -11,7 +11,7 @@ export const useSyncWatchAddress = () => {
     const address = searchParams.get("address");
     if (address) {
       try {
-        const checksum = ethersUtils.getAddress(address);
+        const checksum = getAddress(address);
         if (checksum !== account.watchAddress) {
           account.setWatchAddress(checksum);
         }

@@ -1,5 +1,4 @@
-import { providers, utils as ethersUtils } from "ethers";
-import * as zksync from "@matterlabs/zksync-js";
+import { formatUnits, JsonRpcProvider, parseUnits } from "ethers";
 import { ChainConfig } from "../utils/config";
 
 export type RpcState = {
@@ -30,21 +29,21 @@ export const pickRpcUrl = async (chain: ChainConfig): Promise<RpcState> => {
   return { rpcUrl: chain.rpcUrls[0], isDegraded: true };
 };
 
-export const createL2Provider = (rpcUrl: string) => new zksync.Provider(rpcUrl);
+export const createL2Provider = (rpcUrl: string) => new JsonRpcProvider(rpcUrl);
 
 export const createL1Provider = (chain: ChainConfig) =>
-  new providers.JsonRpcProvider(chain.l1RpcUrls[0], chain.l1ChainId);
+  new JsonRpcProvider(chain.l1RpcUrls[0], chain.l1ChainId);
 
 export const getExplorerTxUrl = (chain: ChainConfig, txHash: string) =>
   `${chain.explorerUrls[0]}/tx/${txHash}`;
 
 export const formatAmount = (amount: string, decimals: number) => {
   try {
-    return ethersUtils.formatUnits(amount, decimals);
+    return formatUnits(BigInt(amount), decimals);
   } catch {
     return amount;
   }
 };
 
 export const parseAmount = (amount: string, decimals: number) =>
-  ethersUtils.parseUnits(amount || "0", decimals);
+  parseUnits(amount || "0", decimals);

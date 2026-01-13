@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { VoidSigner, ZeroAddress } from "ethers";
 import { useParams, useSearchParams } from "react-router-dom";
-import * as zksync from "@matterlabs/zksync-js";
 import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { TxStatusCard } from "../components/TxStatusCard";
@@ -9,7 +9,7 @@ import { useWallet } from "../runtime/wallet";
 import { useChainProviders } from "../runtime/useChainProviders";
 import { useSyncWatchAddress } from "../runtime/useSyncWatchAddress";
 import { getChain } from "../utils/config";
-import { fetchWithdrawalStatus, finalizeWithdrawal } from "../runtime/withdrawal";
+import { createSdk } from "../runtime/sdk";
 import { getExplorerTxUrl } from "../runtime/chainRuntime";
 import { upsertStoredTx, StoredTx } from "../storage/txStore";
 
@@ -34,17 +34,37 @@ export const FinalizePage = () => {
     let isActive = true;
     let timer: number;
     const poll = async () => {
-      if (!l2Provider || !txHash) {
+      if (!l2Provider || !l1Provider || !txHash) {
         return;
       }
       try {
-        const result = await fetchWithdrawalStatus(l2Provider, txHash);
+        const signer =
+          wallet.signer ??
+          new VoidSigner(account.address ?? ZeroAddress, l1Provider);
+        const sdk = createSdk({ l1Provider, l2Provider, signer });
+        const result = await sdk.withdrawals.status(txHash as `0x${string}`);
         if (!isActive) {
           return;
         }
-        setStatus(result.details);
-        setReady(result.label === "ready");
-        setFinalized(result.label === "finalized");
+        const statusValue =
+          typeof result === "object" && result
+            ? ((result as { status?: string; state?: string }).status ??
+              (result as { status?: string; state?: string }).state ??
+              "")
+            : "";
+        if (statusValue === "ready" || statusValue === "ready-to-finalize") {
+          setStatus("Withdrawal is ready to finalize.");
+          setReady(true);
+          setFinalized(false);
+        } else if (statusValue === "finalized" || statusValue === "completed") {
+          setStatus("Withdrawal already finalized.");
+          setReady(false);
+          setFinalized(true);
+        } else {
+          setStatus("Withdrawal not yet ready for finalization.");
+          setReady(false);
+          setFinalized(false);
+        }
       } catch (error) {
         if (isActive) {
           setStatus(`Unable to fetch withdrawal status: ${(error as Error).message}`);
@@ -61,7 +81,7 @@ export const FinalizePage = () => {
         window.clearTimeout(timer);
       }
     };
-  }, [l2Provider, txHash]);
+  }, [account.address, l1Provider, l2Provider, txHash, wallet.signer]);
 
   if (!chain) {
     return (
@@ -77,17 +97,22 @@ export const FinalizePage = () => {
     }
     setStatus("Submitting finalization...");
     try {
-      const zkWallet = zksync.Wallet.fromEthSigner(wallet.signer, l2Provider, l1Provider);
-      const finalizeTx = await finalizeWithdrawal(zkWallet, txHash);
-      const explorerUrl = getExplorerTxUrl(chain, finalizeTx.hash);
+      const sdk = createSdk({ l1Provider, l2Provider, signer: wallet.signer });
+      const result = await sdk.withdrawals.tryFinalize(txHash as `0x${string}`);
+      if (!result.ok) {
+        throw result.error;
+      }
+      const finalizeTxHash =
+        (result.value as { receipt?: { hash?: string } }).receipt?.hash ?? txHash;
+      const explorerUrl = getExplorerTxUrl(chain, finalizeTxHash);
       const stored: StoredTx = {
-        id: `finalize-${finalizeTx.hash}`,
+        id: `finalize-${finalizeTxHash}`,
         type: "finalize",
         chainKey: chain.chainKey,
         address: wallet.address ?? account.address ?? "",
         token: "N/A",
         amount: "0",
-        txHash: finalizeTx.hash,
+        txHash: finalizeTxHash,
         explorerUrl,
         createdAt: Date.now(),
         updatedAt: Date.now(),

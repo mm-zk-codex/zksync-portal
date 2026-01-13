@@ -10,8 +10,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@matterlabs/zksync-js": "^0.16.0",
-    "ethers": "^5.7.2",
+    "@matterlabs/zksync-js": "0.0.3",
+    "ethers": "^6.13.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3"

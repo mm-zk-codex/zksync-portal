@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import * as zksync from "@matterlabs/zksync-js";
+import { ETH_ADDRESS } from "@matterlabs/zksync-js/core";
 import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { TxStatusCard } from "../components/TxStatusCard";
@@ -13,6 +13,7 @@ import { getChain, getTokensForChain } from "../utils/config";
 import { parseAmount, getExplorerTxUrl } from "../runtime/chainRuntime";
 import { upsertStoredTx, updateStoredTxStatus, StoredTx } from "../storage/txStore";
 import { isValidAmount } from "../utils/amount";
+import { createSdk } from "../runtime/sdk";
 
 export const WithdrawPage = () => {
   const { chainKey } = useParams();
@@ -59,22 +60,26 @@ export const WithdrawPage = () => {
     }
     setStatus("Submitting withdrawal...");
     try {
-      const zkWallet = zksync.Wallet.fromEthSigner(wallet.signer, l2Provider!, l1Provider!);
+      const sdk = createSdk({ l1Provider: l1Provider!, l2Provider: l2Provider!, signer: wallet.signer });
       const value = parseAmount(amount, token.decimals);
-      const withdrawTx = await zkWallet.withdraw({
-        token: token.isNative ? zksync.utils.ETH_ADDRESS : token.address!,
+      const createResult = await sdk.withdrawals.tryCreate({
+        token: token.isNative ? ETH_ADDRESS : token.address!,
         amount: value,
-        to: account.address ?? undefined
+        to: (account.address ?? undefined) as string | undefined
       });
-      const explorerUrl = getExplorerTxUrl(chain, withdrawTx.hash);
+      if (!createResult.ok) {
+        throw createResult.error;
+      }
+      const handle = createResult.value as { l2TxHash: string };
+      const explorerUrl = getExplorerTxUrl(chain, handle.l2TxHash);
       const stored: StoredTx = {
-        id: `withdraw-${withdrawTx.hash}`,
+        id: `withdraw-${handle.l2TxHash}`,
         type: "withdraw",
         chainKey: chain.chainKey,
         address: wallet.address ?? account.address ?? "",
         token: token.symbol,
         amount,
-        txHash: withdrawTx.hash,
+        txHash: handle.l2TxHash,
         explorerUrl,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -82,7 +87,7 @@ export const WithdrawPage = () => {
       };
       setTx(stored);
       upsertStoredTx(stored);
-      const receipt = await l2Provider!.waitForTransaction(withdrawTx.hash);
+      const receipt = await l2Provider!.waitForTransaction(handle.l2TxHash);
       if (receipt && receipt.status === 1) {
         updateStoredTxStatus(stored.id, "confirmed");
         setTx({ ...stored, status: "confirmed" });

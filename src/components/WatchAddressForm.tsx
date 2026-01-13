@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { utils as ethersUtils } from "ethers";
+import { getAddress } from "ethers";
 import { useAccount } from "../runtime/account";
 
 export const WatchAddressForm = () => {
@@ -29,7 +29,7 @@ export const WatchAddressForm = () => {
       return;
     }
     try {
-      const checksum = ethersUtils.getAddress(input.trim());
+      const checksum = getAddress(input.trim());
       account.setWatchAddress(checksum);
       syncAddressToUrl(checksum);
       setError(null);

@@ -1,13 +1,11 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { providers } from "ethers";
-import * as zksync from "@matterlabs/zksync-js";
+import { BrowserProvider, JsonRpcSigner, type Eip1193Provider } from "ethers";
 
 export type WalletState = {
   address: string | null;
   chainId: number | null;
-  provider: providers.Web3Provider | null;
-  signer: providers.JsonRpcSigner | null;
-  zksyncWallet: zksync.Wallet | null;
+  provider: BrowserProvider | null;
+  signer: JsonRpcSigner | null;
   connect: () => Promise<void>;
   disconnect: () => void;
   switchNetwork: (chainId: number) => Promise<void>;
@@ -18,24 +16,22 @@ const WalletContext = createContext<WalletState | undefined>(undefined);
 export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
-  const [provider, setProvider] = useState<providers.Web3Provider | null>(null);
-  const [signer, setSigner] = useState<providers.JsonRpcSigner | null>(null);
-  const [zksyncWallet, setZksyncWallet] = useState<zksync.Wallet | null>(null);
+  const [provider, setProvider] = useState<BrowserProvider | null>(null);
+  const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
 
   const connect = async () => {
     if (!window.ethereum) {
       throw new Error("No injected wallet available");
     }
-    const web3Provider = new providers.Web3Provider(window.ethereum as providers.ExternalProvider);
+    const web3Provider = new BrowserProvider(window.ethereum as Eip1193Provider);
     await web3Provider.send("eth_requestAccounts", []);
-    const nextSigner = web3Provider.getSigner();
+    const nextSigner = await web3Provider.getSigner();
     const nextAddress = await nextSigner.getAddress();
     const network = await web3Provider.getNetwork();
     setAddress(nextAddress);
-    setChainId(network.chainId);
+    setChainId(Number(network.chainId));
     setProvider(web3Provider);
     setSigner(nextSigner);
-    setZksyncWallet(zksync.Wallet.fromEthSigner(nextSigner));
   };
 
   useEffect(() => {
@@ -66,7 +62,6 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     setChainId(null);
     setProvider(null);
     setSigner(null);
-    setZksyncWallet(null);
   };
 
   const switchNetwork = async (targetChainId: number) => {
@@ -85,12 +80,11 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       chainId,
       provider,
       signer,
-      zksyncWallet,
       connect,
       disconnect,
       switchNetwork
     }),
-    [address, chainId, provider, signer, zksyncWallet]
+    [address, chainId, provider, signer]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;

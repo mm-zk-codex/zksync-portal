@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { utils as ethersUtils } from "ethers";
+import { getAddress } from "ethers";
 import { useWallet } from "./wallet";
 
 type AccountMode = "wallet" | "watch";
@@ -33,7 +33,7 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
 
   const setWatchAddress = (address: string | null) => {
     if (address) {
-      const checksummed = ethersUtils.getAddress(address);
+      const checksummed = getAddress(address);
       window.localStorage.setItem(STORAGE_KEY, checksummed);
       setWatchAddressState(checksummed);
     } else {

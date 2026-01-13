@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { providers } from "ethers";
-import * as zksync from "@matterlabs/zksync-js";
+import { JsonRpcProvider } from "ethers";
 import { ChainConfig } from "../utils/config";
 import { pickRpcUrl } from "./chainRuntime";
 
@@ -26,10 +25,9 @@ export const useChainProviders = (chain: ChainConfig | undefined) => {
     };
   }, [chain]);
 
-  const l2Provider = useMemo(() => (rpcUrl ? new zksync.Provider(rpcUrl) : null), [rpcUrl]);
+  const l2Provider = useMemo(() => (rpcUrl ? new JsonRpcProvider(rpcUrl) : null), [rpcUrl]);
   const l1Provider = useMemo(
-    () =>
-      chain ? new providers.JsonRpcProvider(chain.l1RpcUrls[0], chain.l1ChainId) : null,
+    () => (chain ? new JsonRpcProvider(chain.l1RpcUrls[0], chain.l1ChainId) : null),
     [chain]
   );
 
