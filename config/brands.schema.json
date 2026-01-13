@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/brands.schema.json",
+  "title": "Atlas Portal Brands",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["brandKey", "displayName", "assets", "theme"],
+    "properties": {
+      "brandKey": { "type": "string" },
+      "displayName": { "type": "string" },
+      "assets": {
+        "type": "object",
+        "required": ["logo", "favicon"],
+        "properties": {
+          "logo": { "type": "string" },
+          "favicon": { "type": "string" },
+          "background": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "theme": {
+        "type": "object",
+        "required": ["primary", "secondary", "background", "text"],
+        "properties": {
+          "primary": { "type": "string" },
+          "secondary": { "type": "string" },
+          "background": { "type": "string" },
+          "text": { "type": "string" },
+          "muted": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "copy": {
+        "type": "object",
+        "properties": {
+          "appName": { "type": "string" },
+          "tagline": { "type": "string" },
+          "footerLinks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "href"],
+              "properties": {
+                "label": { "type": "string" },
+                "href": { "type": "string", "format": "uri" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  }
+}

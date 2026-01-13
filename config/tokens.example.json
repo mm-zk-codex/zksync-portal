@@ -1,0 +1,55 @@
+[
+  {
+    "chainKey": "abstract-mainnet",
+    "tokens": [
+      {
+        "symbol": "ETH",
+        "name": "Ether",
+        "decimals": 18,
+        "address": null,
+        "isNative": true,
+        "enabled": true
+      },
+      {
+        "symbol": "USDC",
+        "name": "USD Coin",
+        "decimals": 6,
+        "address": "0x0000000000000000000000000000000000001001",
+        "isNative": false,
+        "logoURI": "https://assets.example.org/tokens/usdc.svg",
+        "enabled": true
+      },
+      {
+        "symbol": "DAI",
+        "name": "Dai Stablecoin",
+        "decimals": 18,
+        "address": "0x0000000000000000000000000000000000001002",
+        "isNative": false,
+        "logoURI": "https://assets.example.org/tokens/dai.svg",
+        "enabled": true
+      }
+    ]
+  },
+  {
+    "chainKey": "atlas-testnet",
+    "tokens": [
+      {
+        "symbol": "tETH",
+        "name": "Test Ether",
+        "decimals": 18,
+        "address": null,
+        "isNative": true,
+        "enabled": true
+      },
+      {
+        "symbol": "tUSDC",
+        "name": "Test USD Coin",
+        "decimals": 6,
+        "address": "0x0000000000000000000000000000000000002001",
+        "isNative": false,
+        "logoURI": "https://assets.example.org/tokens/usdc.svg",
+        "enabled": true
+      }
+    ]
+  }
+]

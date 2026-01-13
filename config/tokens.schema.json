@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/tokens.schema.json",
+  "title": "Atlas Portal Tokens",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["chainKey", "tokens"],
+    "properties": {
+      "chainKey": {
+        "type": "string",
+        "description": "Stable chain identifier matching chains config."
+      },
+      "tokens": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": [
+            "symbol",
+            "name",
+            "decimals",
+            "address",
+            "isNative",
+            "enabled"
+          ],
+          "properties": {
+            "symbol": { "type": "string" },
+            "name": { "type": "string" },
+            "decimals": { "type": "integer", "minimum": 0 },
+            "address": {
+              "type": ["string", "null"],
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            },
+            "isNative": { "type": "boolean" },
+            "logoURI": { "type": "string", "format": "uri" },
+            "enabled": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "$comment": "Token lists are config-only in Deliverable 0; no user-paste tokens without warnings in future."
+}
