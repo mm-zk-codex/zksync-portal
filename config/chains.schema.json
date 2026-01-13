@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/chains.schema.json",
+  "title": "Atlas Portal Chains",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "chainKey",
+      "chainId",
+      "name",
+      "networkType",
+      "rpcUrls",
+      "explorerUrls",
+      "l1ChainId",
+      "features",
+      "contracts"
+    ],
+    "properties": {
+      "chainKey": {
+        "type": "string",
+        "description": "Stable string identifier used in routes and deep links."
+      },
+      "chainId": {
+        "type": "integer",
+        "description": "EVM chainId for the L2 chain."
+      },
+      "name": {
+        "type": "string",
+        "description": "Human-readable chain name."
+      },
+      "networkType": {
+        "type": "string",
+        "enum": ["mainnet", "testnet", "dev"],
+        "description": "Network classification for display and warnings."
+      },
+      "rpcUrls": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": "Ordered RPC URLs for fallback."
+      },
+      "explorerUrls": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": "Explorer base URLs for the L2 chain."
+      },
+      "l1ChainId": {
+        "type": "integer",
+        "description": "EVM chainId for the L1 chain (Ethereum mainnet/testnet)."
+      },
+      "l1RpcUrls": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": "Optional L1 RPCs if needed for finalization."
+      },
+      "contracts": {
+        "type": "object",
+        "required": [
+          "l1Bridge",
+          "l2Bridge",
+          "l1SharedBridge",
+          "l2SharedBridge",
+          "l1Weth",
+          "l2Weth"
+        ],
+        "properties": {
+          "l1Bridge": { "$ref": "#/$defs/address" },
+          "l2Bridge": { "$ref": "#/$defs/address" },
+          "l1SharedBridge": { "$ref": "#/$defs/address" },
+          "l2SharedBridge": { "$ref": "#/$defs/address" },
+          "l1Weth": { "$ref": "#/$defs/address" },
+          "l2Weth": { "$ref": "#/$defs/address" }
+        },
+        "additionalProperties": false,
+        "description": "Bridge/system contract addresses required by zksync-js (placeholders allowed in examples)."
+      },
+      "features": {
+        "type": "object",
+        "required": ["deposits", "withdrawals", "finalizeSupported"],
+        "properties": {
+          "deposits": { "type": "boolean" },
+          "withdrawals": { "type": "boolean" },
+          "finalizeSupported": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "ui": {
+        "type": "object",
+        "properties": {
+          "logoKey": { "type": "string" },
+          "themeKey": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "$defs": {
+    "address": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "description": "Checksummed or lowercase hex address."
+    }
+  }
+}

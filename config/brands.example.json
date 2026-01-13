@@ -1,0 +1,49 @@
+[
+  {
+    "brandKey": "default",
+    "displayName": "Atlas Portal",
+    "assets": {
+      "logo": "brand/default/logo.svg",
+      "favicon": "brand/default/favicon.ico",
+      "background": "brand/default/background.png"
+    },
+    "theme": {
+      "primary": "#5B65F5",
+      "secondary": "#7C82FF",
+      "background": "#0B0D17",
+      "text": "#FFFFFF",
+      "muted": "#9AA0B4"
+    },
+    "copy": {
+      "appName": "Atlas Portal",
+      "tagline": "Bridge assets across the Elastic Network.",
+      "footerLinks": [
+        { "label": "Docs", "href": "https://example.org/docs" },
+        { "label": "Support", "href": "https://example.org/support" }
+      ]
+    }
+  },
+  {
+    "brandKey": "abstract",
+    "displayName": "Abstract Portal",
+    "assets": {
+      "logo": "brand/abstract/logo.svg",
+      "favicon": "brand/abstract/favicon.ico",
+      "background": "brand/abstract/background.png"
+    },
+    "theme": {
+      "primary": "#7E4BFF",
+      "secondary": "#B08CFF",
+      "background": "#0E0C14",
+      "text": "#F7F4FF",
+      "muted": "#B9AACF"
+    },
+    "copy": {
+      "appName": "Abstract Bridge",
+      "tagline": "Move assets into Abstract.",
+      "footerLinks": [
+        { "label": "Abstract", "href": "https://abstract.example.org" }
+      ]
+    }
+  }
+]
