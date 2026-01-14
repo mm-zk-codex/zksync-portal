@@ -74,5 +74,43 @@
       "logoKey": "atlas",
       "themeKey": "default"
     }
+  },
+  {
+    "chainKey": "zkos-testnet-alpha",
+    "chainId": 8022833,
+    "name": "zkOS Testnet Alpha",
+    "networkType": "testnet",
+    "rpcUrls": [
+      "https://zksync-os-testnet-alpha.zksync.dev/"
+    ],
+    "explorerUrls": [
+      "https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev/"
+    ],
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "l1ChainId": 11155111,
+    "l1RpcUrls": [
+      "https://gateway.tenderly.co/public/sepolia"
+    ],
+    "contracts": {
+      "l1Bridge": "0x0000000000000000000000000000000000000101",
+      "l2Bridge": "0x0000000000000000000000000000000000000102",
+      "l1SharedBridge": "0x0000000000000000000000000000000000000103",
+      "l2SharedBridge": "0x0000000000000000000000000000000000000104",
+      "l1Weth": "0x0000000000000000000000000000000000000105",
+      "l2Weth": "0x0000000000000000000000000000000000000106"
+    },
+    "features": {
+      "deposits": true,
+      "withdrawals": true,
+      "finalizeSupported": true
+    },
+    "ui": {
+      "logoKey": "atlas",
+      "themeKey": "default"
+    }
   }
 ]
