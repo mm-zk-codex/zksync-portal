@@ -9,6 +9,11 @@ const sampleChains = [
     networkType: "testnet",
     rpcUrls: ["https://rpc"],
     explorerUrls: ["https://explorer"],
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18
+    },
     l1ChainId: 11155111,
     l1RpcUrls: ["https://l1"],
     contracts: {

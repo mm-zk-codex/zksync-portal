@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { BrowserProvider, JsonRpcSigner, type Eip1193Provider } from "ethers";
+import { ChainConfig } from "../utils/config";
 
 export type WalletState = {
   address: string | null;
@@ -8,7 +9,7 @@ export type WalletState = {
   signer: JsonRpcSigner | null;
   connect: () => Promise<void>;
   disconnect: () => void;
-  switchNetwork: (chainId: number) => Promise<void>;
+  switchNetwork: (options: { targetChainId: number; chain?: ChainConfig }) => Promise<void>;
 };
 
 const WalletContext = createContext<WalletState | undefined>(undefined);
@@ -24,7 +25,10 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("No injected wallet available");
     }
     const web3Provider = new BrowserProvider(window.ethereum as Eip1193Provider);
-    await web3Provider.send("eth_requestAccounts", []);
+    const accounts = (await web3Provider.send("eth_requestAccounts", [])) as string[];
+    if (!accounts || accounts.length === 0) {
+      throw new Error("No accounts returned from wallet.");
+    }
     const nextSigner = await web3Provider.getSigner();
     const nextAddress = await nextSigner.getAddress();
     const network = await web3Provider.getNetwork();
@@ -64,14 +68,54 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     setSigner(null);
   };
 
-  const switchNetwork = async (targetChainId: number) => {
+  const isUnknownChainError = (error: unknown) => {
+    if (error && typeof error === "object" && "code" in error) {
+      return (error as { code?: number }).code === 4902;
+    }
+    if (error && typeof error === "object" && "message" in error) {
+      const message = String((error as { message?: string }).message).toLowerCase();
+      return message.includes("unrecognized chain") || message.includes("unknown chain");
+    }
+    return false;
+  };
+
+  const switchNetwork = async ({ targetChainId, chain }: { targetChainId: number; chain?: ChainConfig }) => {
     if (!window.ethereum) {
       throw new Error("No injected wallet available");
     }
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: `0x${targetChainId.toString(16)}` }]
-    });
+    const chainIdHex = `0x${targetChainId.toString(16)}`;
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: chainIdHex }]
+      });
+    } catch (error) {
+      if (!isUnknownChainError(error)) {
+        throw error;
+      }
+      if (!chain || chain.chainId !== targetChainId) {
+        throw new Error("This chain can’t be added automatically; missing wallet metadata in config.");
+      }
+      if (!chain.rpcUrls.length || !chain.explorerUrls.length || !chain.nativeCurrency) {
+        throw new Error("This chain can’t be added automatically; missing wallet metadata in config.");
+      }
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: chainIdHex,
+            chainName: chain.name,
+            rpcUrls: chain.rpcUrls,
+            nativeCurrency: chain.nativeCurrency,
+            blockExplorerUrls: chain.explorerUrls
+          }
+        ]
+      });
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: chainIdHex }]
+      });
+    }
   };
 
   const value = useMemo(

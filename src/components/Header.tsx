@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useBrand } from "../runtime/brand";
 import { useWallet } from "../runtime/wallet";
 import { useAccount } from "../runtime/account";
 import { chains } from "../utils/config";
 import { SINGLE_CHAIN_KEY } from "../utils/env";
+import { ErrorNotice } from "./ErrorNotice";
+import { normalizeError, type NormalizedError } from "../utils/errors";
 
 export const Header = () => {
   const { brand } = useBrand();
@@ -11,12 +14,14 @@ export const Header = () => {
   const account = useAccount();
   const location = useLocation();
   const navigate = useNavigate();
+  const [connectError, setConnectError] = useState<NormalizedError | null>(null);
 
   const handleConnect = async () => {
     try {
       await wallet.connect();
+      setConnectError(null);
     } catch (error) {
-      alert((error as Error).message);
+      setConnectError(normalizeError(error, { action: "Connect wallet" }));
     }
   };
 
@@ -84,6 +89,7 @@ export const Header = () => {
           )}
         </div>
       </div>
+      {connectError ? <ErrorNotice error={connectError} variant="banner" /> : null}
       <nav className="flex" style={{ gap: 16, marginTop: 12 }}>
         <NavLink to="/" end>
           Home

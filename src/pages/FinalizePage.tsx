@@ -3,6 +3,7 @@ import { VoidSigner, ZeroAddress } from "ethers";
 import { useParams, useSearchParams } from "react-router-dom";
 import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
+import { ErrorNotice } from "../components/ErrorNotice";
 import { TxStatusCard } from "../components/TxStatusCard";
 import { useAccount } from "../runtime/account";
 import { useWallet } from "../runtime/wallet";
@@ -12,6 +13,7 @@ import { getChain } from "../utils/config";
 import { createSdk } from "../runtime/sdk";
 import { getExplorerTxUrl } from "../runtime/chainRuntime";
 import { upsertStoredTx, StoredTx } from "../storage/txStore";
+import { normalizeError, type NormalizedError } from "../utils/errors";
 
 export const FinalizePage = () => {
   const { chainKey } = useParams();
@@ -27,6 +29,9 @@ export const FinalizePage = () => {
   const [ready, setReady] = useState(false);
   const [finalized, setFinalized] = useState(false);
   const [tx, setTx] = useState<StoredTx | null>(null);
+  const [statusError, setStatusError] = useState<NormalizedError | null>(null);
+  const [submitError, setSubmitError] = useState<NormalizedError | null>(null);
+  const [networkError, setNetworkError] = useState<NormalizedError | null>(null);
 
   const isChainMismatch = wallet.chainId ? wallet.chainId !== chain?.l1ChainId : false;
 
@@ -46,28 +51,33 @@ export const FinalizePage = () => {
         if (!isActive) {
           return;
         }
-        const statusValue =
-          typeof result === "object" && result
-            ? ((result as { status?: string; state?: string }).status ??
-              (result as { status?: string; state?: string }).state ??
-              "")
-            : "";
-        if (statusValue === "ready" || statusValue === "ready-to-finalize") {
+        const statusValue = result.phase.toString().toLowerCase();
+        if (statusValue === "ready_to_finalize") {
           setStatus("Withdrawal is ready to finalize.");
           setReady(true);
           setFinalized(false);
+          setStatusError(null);
         } else if (statusValue === "finalized" || statusValue === "completed") {
           setStatus("Withdrawal already finalized.");
           setReady(false);
           setFinalized(true);
+          setStatusError(null);
         } else {
           setStatus("Withdrawal not yet ready for finalization.");
           setReady(false);
           setFinalized(false);
+          setStatusError(null);
         }
       } catch (error) {
         if (isActive) {
-          setStatus(`Unable to fetch withdrawal status: ${(error as Error).message}`);
+          setStatus("Unable to fetch withdrawal status.");
+          setStatusError(
+            normalizeError(error, {
+              action: "Fetch withdrawal status",
+              chainKey: chain?.chainKey,
+              rpcUrl: chain?.l1RpcUrls[0]
+            })
+          );
         }
       }
       if (isActive) {
@@ -91,10 +101,25 @@ export const FinalizePage = () => {
     );
   }
 
+  const handleNetworkSwitch = async () => {
+    setNetworkError(null);
+    try {
+      await wallet.switchNetwork({ targetChainId: chain.l1ChainId });
+    } catch (error) {
+      setNetworkError(
+        normalizeError(error, {
+          action: "Switch network",
+          targetChainId: chain.l1ChainId
+        })
+      );
+    }
+  };
+
   const submitFinalize = async () => {
     if (!wallet.signer || !l2Provider || !l1Provider || !txHash) {
       return;
     }
+    setSubmitError(null);
     setStatus("Submitting finalization...");
     try {
       const sdk = createSdk({ l1Provider, l2Provider, signer: wallet.signer });
@@ -122,7 +147,15 @@ export const FinalizePage = () => {
       setTx(stored);
       setStatus("Finalize transaction submitted.");
     } catch (error) {
-      setStatus(`Finalize failed: ${(error as Error).message}`);
+      setStatus(null);
+      setSubmitError(
+        normalizeError(error, {
+          action: "Finalize",
+          chainKey: chain.chainKey,
+          txHash,
+          rpcUrl: chain.l1RpcUrls[0]
+        })
+      );
     }
   };
 
@@ -144,14 +177,16 @@ export const FinalizePage = () => {
         ) : (
           <div className="banner warning">{status}</div>
         )}
+        {statusError ? <ErrorNotice error={statusError} variant="banner" /> : null}
         {isChainMismatch ? (
           <div className="banner warning">
             <div>Wallet is on the wrong network. Switch to chain ID {chain.l1ChainId}.</div>
-            <button className="secondary-button" onClick={() => wallet.switchNetwork(chain.l1ChainId)}>
+            <button className="secondary-button" onClick={handleNetworkSwitch}>
               Switch network
             </button>
           </div>
         ) : null}
+        {networkError ? <ErrorNotice error={networkError} variant="banner" /> : null}
         {account.isWatchMode ? (
           <div className="banner warning">Connect a wallet to finalize this withdrawal.</div>
         ) : null}
@@ -162,6 +197,7 @@ export const FinalizePage = () => {
         >
           Finalize
         </button>
+        {submitError ? <ErrorNotice error={submitError} variant="banner" /> : null}
         <div className="small muted" style={{ marginTop: 12 }}>
           Finalization requires L1 confirmation and proof availability. Keep this tab open or return later.
         </div>

@@ -14,6 +14,11 @@ This MVP connects directly to RPC endpoints from the browser. Without an indexer
 - The portal polls RPCs to check if a withdrawal is ready, but this is not guaranteed if providers lack the required method.
 - Expect delays; keep the tab open or return later.
 
+## Wallet chain switching
+
+- When chain metadata (RPC, explorer, native currency) is configured, the portal can prompt wallets to add missing L2 networks automatically.
+- If metadata is missing, wallets must be configured manually before switching.
+
 ## Recommended RPC providers
 
 - Use multiple RPC URLs per chain in `config/chains.json` for fallback.
