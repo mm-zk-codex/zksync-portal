@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Interface, VoidSigner, ZeroAddress, formatUnits, getAddress } from "ethers";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { ErrorNotice } from "../components/ErrorNotice";
 import { TxStatusCard } from "../components/TxStatusCard";
@@ -554,7 +553,6 @@ export const FinalizePage = () => {
 
   return (
     <main className="container">
-      <ChainBanner chain={chain} />
       {isDegraded ? <div className="banner warning">RPC degraded: using fallback RPC.</div> : null}
       <div className="card">
         <div className="flex space-between">

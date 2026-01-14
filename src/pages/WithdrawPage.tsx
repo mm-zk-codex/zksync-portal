@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Contract, formatUnits } from "ethers";
 import { ETH_ADDRESS } from "@matterlabs/zksync-js/core";
-import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { ErrorNotice } from "../components/ErrorNotice";
 import { TokenSelect } from "../components/TokenSelect";
@@ -390,7 +389,6 @@ export const WithdrawPage = () => {
 
   return (
     <main className="container">
-      <ChainBanner chain={chain} />
       {isDegraded ? <div className="banner warning">RPC degraded: using fallback RPC.</div> : null}
       <div className="card">
         <div className="flex space-between">

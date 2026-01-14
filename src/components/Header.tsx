@@ -8,7 +8,12 @@ import { SINGLE_CHAIN_KEY } from "../utils/env";
 import { ErrorNotice } from "./ErrorNotice";
 import { normalizeError, type NormalizedError } from "../utils/errors";
 import { ChainSelector } from "./ChainSelector";
-import { AccountModeToggle } from "./AccountModeToggle";
+
+const ChevronIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
 
 export const Header = () => {
   const { brand } = useBrand();
@@ -21,6 +26,7 @@ export const Header = () => {
   const handleConnect = async () => {
     try {
       await wallet.connect();
+      account.setMode("wallet");
       setConnectError(null);
     } catch (error) {
       setConnectError(normalizeError(error, { action: "Connect wallet" }));
@@ -38,6 +44,7 @@ export const Header = () => {
   const activeChainKey = routeChainKey || queryChainKey || SINGLE_CHAIN_KEY || "";
   const selectedChain = activeChainKey ? getChain(activeChainKey) : undefined;
   const hasSelectedChain = Boolean(activeChainKey);
+  const isWalletConnected = Boolean(wallet.address);
 
   const activityLink = activeChainKey ? `/chain/${activeChainKey}/activity` : "/";
   const finalizeLink = activeChainKey ? `/chain/${activeChainKey}/finalize` : "/";
@@ -46,51 +53,48 @@ export const Header = () => {
     navigate(`/chain/${value}`);
   };
 
-  const addressLabel = "Active account";
-  const addressValue = account.address
-    ? `${account.mode === "wallet" ? "Wallet" : "Watching"}: ${account.address}`
-    : "No address selected";
+  const formatAddress = (address: string) => {
+    if (address.length <= 12) {
+      return address;
+    }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   const handleCopy = async () => {
-    if (!account.address) {
+    if (!wallet.address) {
       return;
     }
-    await navigator.clipboard.writeText(account.address);
+    await navigator.clipboard.writeText(wallet.address);
   };
 
   return (
     <header className="container" style={{ paddingBottom: 8 }}>
-      <div className="flex space-between" style={{ alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-        <div className="flex" style={{ gap: 16 }}>
-          <img src={`/${brand.assets.logo}`} alt={brand.displayName} style={{ height: 32 }} />
-          <div>
-            <div style={{ fontWeight: 700 }}>{brand.copy.appName}</div>
-            <div className="muted small">{brand.copy.tagline}</div>
-          </div>
+      <div className="header-bar">
+        <div className="header-brand">
+          <NavLink to="/" className="brand-title">
+            {brand.copy.appName}
+          </NavLink>
+          <div className="muted small">{brand.copy.tagline}</div>
         </div>
         <div className="header-controls">
           {SINGLE_CHAIN_KEY ? null : (
             <ChainSelector chains={chains} activeChainKey={activeChainKey} onChange={handleChainChange} />
           )}
-          <div className="account-stack">
-            <AccountModeToggle mode={account.mode} onChange={account.setMode} compact />
-            <div className="address-card">
-              <div className="small muted">{addressLabel}</div>
-              <div className="address-row">
-                <span className="small">{addressValue}</span>
-                <button className="icon-button" type="button" onClick={handleCopy} disabled={!account.address}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                    <rect x="2" y="2" width="9" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                  </svg>
+          {isWalletConnected ? (
+            <details className="account-menu">
+              <summary className="account-trigger">
+                <span className="small">{formatAddress(wallet.address!)}</span>
+                <ChevronIcon />
+              </summary>
+              <div className="account-menu-panel">
+                <button className="select-option" type="button" onClick={handleCopy}>
+                  Copy address
+                </button>
+                <button className="select-option" type="button" onClick={handleDisconnect}>
+                  Disconnect
                 </button>
               </div>
-            </div>
-          </div>
-          {wallet.address ? (
-            <button className="secondary-button" onClick={handleDisconnect}>
-              Disconnect
-            </button>
+            </details>
           ) : (
             <button className="primary-button" onClick={handleConnect}>
               Connect Wallet
@@ -100,17 +104,17 @@ export const Header = () => {
       </div>
       {connectError ? <ErrorNotice error={connectError} variant="banner" /> : null}
       {SINGLE_CHAIN_KEY || hasSelectedChain ? (
-        <nav className="flex" style={{ gap: 16, marginTop: 12 }}>
-          <NavLink to="/" end>
-            Home
-          </NavLink>
-          <NavLink to={activityLink}>Activity</NavLink>
-          <NavLink to={finalizeLink}>Finalize</NavLink>
-        </nav>
-      ) : null}
-      {!SINGLE_CHAIN_KEY && selectedChain ? (
-        <div className="banner" style={{ marginTop: 12 }}>
-          You are on <strong>{selectedChain.name}</strong>.
+        <div style={{ marginTop: 12 }}>
+          {selectedChain ? <div className="chain-title">{selectedChain.name}</div> : null}
+          {isWalletConnected ? (
+            <nav className="flex" style={{ gap: 16 }}>
+              <NavLink to={activeChainKey ? `/chain/${activeChainKey}` : "/"} end>
+                Home
+              </NavLink>
+              <NavLink to={activityLink}>Activity</NavLink>
+              <NavLink to={finalizeLink}>Finalize</NavLink>
+            </nav>
+          ) : null}
         </div>
       ) : null}
     </header>
