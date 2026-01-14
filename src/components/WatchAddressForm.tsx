@@ -44,24 +44,30 @@ export const WatchAddressForm = ({ variant = "card" }: { variant?: "card" | "inl
 
   const formContent = (
     <div className="flex" style={{ flexDirection: "column", gap: 8 }}>
-      <label className="small muted">Watch address (no wallet required)</label>
-      <input
-        className="input"
-        value={input}
-        onChange={(event) => setInput(event.target.value)}
-        placeholder="0x..."
-      />
-      {error ? <div className="small" style={{ color: "#ff9b9b" }}>{error}</div> : null}
-      <div className="flex">
-        <button className="primary-button" type="submit">
-          {input ? "Save watch address" : "Clear watch address"}
+      <div className="search-bar">
+        <input
+          className="input search-input"
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          placeholder="Search by address (0x...)"
+        />
+        <button className="search-button" type="submit" disabled={!input} aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="9" cy="9" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M14 14L18 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
         </button>
       </div>
+      {error ? <div className="small" style={{ color: "#ff9b9b" }}>{error}</div> : null}
     </div>
   );
 
   if (variant === "inline") {
-    return <form onSubmit={handleSubmit}>{formContent}</form>;
+    return (
+      <form className="search-form" onSubmit={handleSubmit}>
+        {formContent}
+      </form>
+    );
   }
 
   return (

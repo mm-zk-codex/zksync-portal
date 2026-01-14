@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { ErrorNotice } from "../components/ErrorNotice";
 import { ExternalLinkButton } from "../components/ExternalLinkButton";
@@ -183,7 +182,6 @@ export const ActivityPage = () => {
 
   return (
     <main className="container">
-      <ChainBanner chain={chain} />
       {isDegraded ? <div className="banner warning">RPC degraded: using fallback RPC.</div> : null}
       <div className="card">
         <div className="flex space-between" style={{ alignItems: "center" }}>

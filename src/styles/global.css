@@ -61,12 +61,37 @@ select option {
   background-image: var(--brand-background-image);
   background-size: cover;
   background-position: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .container {
-  max-width: 1120px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 24px;
+  width: 100%;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  width: 100%;
+}
+
+.footer-text {
+  flex: 1;
+}
+
+.footer-links {
+  margin-left: auto;
 }
 
 .card {
@@ -98,6 +123,117 @@ select option {
 
 .muted {
   color: var(--mutedText, #9aa0b4);
+}
+
+.search-bar {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.search-row .search-bar {
+  width: 100%;
+}
+
+.search-input {
+  flex: 1;
+  border-radius: 10px 0 0 10px !important;
+}
+
+.search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 0 10px 10px 0;
+  border: 1px solid var(--border);
+  border-left: none;
+  background: var(--color-primary, #5b65f5);
+  color: white;
+  cursor: pointer;
+}
+
+.search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.search-form {
+  display: block;
+  width: 100%;
+}
+
+.search-panel {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  width: 100%;
+}
+
+.actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.actions-search {
+  width: 400px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.actions-search .search-bar {
+  width: 400px;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+  align-items: start;
+  width: 100%;
+  justify-items: stretch;
+}
+
+.search-col {
+  min-width: 0;
+  width: 100%;
+}
+
+.brand-title {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--surfaceText);
+  text-decoration: none;
+}
+
+.brand-title:hover {
+  color: var(--color-primary, #5b65f5);
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.header-brand {
+  flex: 1;
+  min-width: 220px;
+}
+
+.chain-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--surfaceText);
+  margin-bottom: 12px;
+  margin-top: 72px;
 }
 
 .primary-button {
@@ -237,27 +373,51 @@ nav a.active {
   display: flex;
   gap: 12px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  margin-left: auto;
 }
 
-.account-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.header-controls > * {
+  min-width: 0;
 }
 
-.address-card {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.04);
+.account-menu {
+  position: relative;
 }
 
-.address-row {
-  display: flex;
+.account-menu summary {
+  list-style: none;
+}
+
+.account-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.account-trigger {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.account-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  z-index: 20;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 20px 40px rgba(5, 8, 24, 0.4);
 }
 
 .logo-badge {
@@ -345,6 +505,7 @@ nav a.active {
 
 .chain-selector {
   min-width: 220px;
+  flex: 0 1 260px;
 }
 
 .token-select {
@@ -378,10 +539,14 @@ nav a.active {
 
 .select-text {
   flex: 1;
+  min-width: 0;
 }
 
 .select-title {
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .select-menu {
@@ -505,17 +670,36 @@ nav a.active {
 }
 
 @media (max-width: 720px) {
+  .header-bar {
+    flex-wrap: wrap;
+  }
+
   .header-controls {
     width: 100%;
     justify-content: flex-start;
-  }
-
-  .account-stack {
-    width: 100%;
+    flex-wrap: wrap;
   }
 
   .select-menu {
     position: static;
     margin-top: 8px;
+  }
+
+  .search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .actions-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions-search {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .actions-search .search-bar {
+    width: 100%;
   }
 }
