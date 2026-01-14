@@ -1,0 +1,68 @@
+[
+  {
+    "chainKey": "zkos-testnet-1",
+    "chainId": 6565,
+    "name": "zkOS Testnet 1",
+    "networkType": "testnet",
+    "rpcUrls": [
+      "http://localhost:3050"
+    ],
+    "explorerUrls": [
+      "https://explorer.abstract.example.org"
+    ],
+    "l1ChainId": 31337,
+    "l1RpcUrls": [
+      "http://localhost:8545"
+    ],
+    "contracts": {
+      "l1Bridge": "0x0000000000000000000000000000000000000001",
+      "l2Bridge": "0x0000000000000000000000000000000000000002",
+      "l1SharedBridge": "0x0000000000000000000000000000000000000003",
+      "l2SharedBridge": "0x0000000000000000000000000000000000000004",
+      "l1Weth": "0x0000000000000000000000000000000000000005",
+      "l2Weth": "0x0000000000000000000000000000000000000006"
+    },
+    "features": {
+      "deposits": true,
+      "withdrawals": true,
+      "finalizeSupported": true
+    },
+    "ui": {
+      "logoKey": "abstract",
+      "themeKey": "abstract"
+    }
+  },
+  {
+    "chainKey": "zkos-testnet-2",
+    "chainId": 6566,
+    "name": "zkOS Testnet 2",
+    "networkType": "testnet",
+    "rpcUrls": [
+      "http://localhost:3051"
+    ],
+    "explorerUrls": [
+      "https://explorer.atlas-testnet.example.org"
+    ],
+    "l1ChainId": 31337,
+    "l1RpcUrls": [
+      "http://localhost:8545"
+    ],
+    "contracts": {
+      "l1Bridge": "0x0000000000000000000000000000000000000101",
+      "l2Bridge": "0x0000000000000000000000000000000000000102",
+      "l1SharedBridge": "0x0000000000000000000000000000000000000103",
+      "l2SharedBridge": "0x0000000000000000000000000000000000000104",
+      "l1Weth": "0x0000000000000000000000000000000000000105",
+      "l2Weth": "0x0000000000000000000000000000000000000106"
+    },
+    "features": {
+      "deposits": true,
+      "withdrawals": true,
+      "finalizeSupported": true
+    },
+    "ui": {
+      "logoKey": "atlas",
+      "themeKey": "default"
+    }
+  }
+]

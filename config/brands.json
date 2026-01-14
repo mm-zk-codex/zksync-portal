@@ -18,8 +18,14 @@
       "appName": "Atlas Portal",
       "tagline": "Bridge assets across the Elastic Network.",
       "footerLinks": [
-        { "label": "Docs", "href": "https://example.org/docs" },
-        { "label": "Support", "href": "https://example.org/support" }
+        {
+          "label": "Docs",
+          "href": "https://example.org/docs"
+        },
+        {
+          "label": "Support",
+          "href": "https://example.org/support"
+        }
       ]
     }
   },
@@ -27,7 +33,7 @@
     "brandKey": "abstract",
     "displayName": "Abstract Portal",
     "assets": {
-      "logo": "brand/abstract/logo.svg",
+      "logo": "brand/abstract/logo.jpeg",
       "favicon": "brand/abstract/favicon.svg",
       "background": "brand/abstract/background.svg"
     },
@@ -42,7 +48,10 @@
       "appName": "Abstract Bridge",
       "tagline": "Move assets into Abstract.",
       "footerLinks": [
-        { "label": "Abstract", "href": "https://abstract.example.org" }
+        {
+          "label": "Abstract",
+          "href": "https://abstract.example.org"
+        }
       ]
     }
   }
