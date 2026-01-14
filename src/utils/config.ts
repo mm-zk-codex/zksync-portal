@@ -63,7 +63,8 @@ export type TokenConfig = {
     symbol: string;
     name: string;
     decimals: number;
-    address: string | null;
+    l1Address: string | null;
+    l2Address: string | null;
     isNative: boolean;
     enabled: boolean;
     logoURI?: string;
@@ -115,7 +116,48 @@ export const parseTokens = (input: unknown): TokenConfig[] => {
     ) {
       throw new Error("Invalid token config entry");
     }
-    return tokenGroup as TokenConfig;
+    const group = tokenGroup as TokenConfig;
+    if (!Array.isArray(group.tokens)) {
+      throw new Error("Token config entry must include tokens array");
+    }
+    const normalizedTokens = group.tokens.map((token) => {
+      const tokenAny = token as {
+        symbol?: string;
+        name?: string;
+        decimals?: number;
+        address?: string | null;
+        l1Address?: string | null;
+        l2Address?: string | null;
+        isNative?: boolean;
+        enabled?: boolean;
+        logoURI?: string;
+      };
+      const l2Address = tokenAny.l2Address ?? tokenAny.address ?? null;
+      const l1Address = tokenAny.l1Address ?? null;
+      if (tokenAny.address && !tokenAny.l2Address && import.meta.env.DEV) {
+        console.warn(
+          `[config] Token ${tokenAny.symbol ?? "unknown"} uses legacy address field; treat as l2Address.`
+        );
+      }
+      if (tokenAny.isNative) {
+        return {
+          ...token,
+          l1Address: null,
+          l2Address: null
+        };
+      }
+      if (!l2Address) {
+        throw new Error(
+          `Token ${tokenAny.symbol ?? "unknown"} on ${group.chainKey} missing l2Address`
+        );
+      }
+      return {
+        ...token,
+        l1Address,
+        l2Address
+      };
+    });
+    return { ...group, tokens: normalizedTokens };
   });
 };
 

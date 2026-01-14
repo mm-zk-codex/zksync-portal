@@ -4,7 +4,7 @@ This document defines the portal’s state machines for **deposit**, **withdraw*
 
 ## Common Inputs
 - `chainKey` (stable string id)  
-- `token` (symbol or address; native token is `isNative=true`)  
+- `token` (symbol or L2 token address; native token is `isNative=true`)  
 - `amount` (decimal string)  
 - `address` (wallet or watch address)  
 

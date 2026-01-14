@@ -53,6 +53,12 @@
 - **Token**: Native or ERC-20 asset configured per chain.  
 - **Watch-address mode**: User-provided address without wallet connection.  
 
+## Token configuration (L1 vs L2 addresses)
+- Each ERC-20 token entry includes **both** `l1Address` and `l2Address`.  
+- `l2Address` is used for L2 balance checks and withdrawals; `l1Address` is used for L1 balance checks and deposits/finalization.  
+- **Native tokens** must set both addresses to `null`.  
+- Common gotcha: **L1 and L2 token addresses can differ**. Always populate both to avoid incorrect balances or finalize failures.  
+
 ## Future Scope Notes (Explicitly Out of Scope)
 - SIWE / Prividium authentication and role-based access.  
 - Token lists fetched from external registries.  
