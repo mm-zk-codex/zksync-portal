@@ -51,13 +51,8 @@ export const FinalizePage = () => {
         if (!isActive) {
           return;
         }
-        const statusValue =
-          typeof result === "object" && result
-            ? ((result as { status?: string; state?: string }).status ??
-              (result as { status?: string; state?: string }).state ??
-              "")
-            : "";
-        if (statusValue === "ready" || statusValue === "ready-to-finalize") {
+        const statusValue = result.phase.toString().toLowerCase();
+        if (statusValue === "ready_to_finalize") {
           setStatus("Withdrawal is ready to finalize.");
           setReady(true);
           setFinalized(false);
