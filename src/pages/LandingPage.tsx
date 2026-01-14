@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { chains } from "../utils/config";
 import { SINGLE_CHAIN_KEY } from "../utils/env";
-import { WatchAddressForm } from "../components/WatchAddressForm";
+import { AccountModePanel } from "../components/AccountModePanel";
+import { getChainLogo } from "../utils/assets";
+import { LogoBadge } from "../components/LogoBadge";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ export const LandingPage = () => {
         runs entirely in your browser.
       </p>
       <div className="grid" style={{ margin: "24px 0" }}>
-        <WatchAddressForm />
+        <AccountModePanel />
         <div className="card">
           <label className="small muted">Search chains</label>
           <input
@@ -51,13 +53,19 @@ export const LandingPage = () => {
         {filteredChains.map((chain) => (
           <button
             key={chain.chainKey}
-            className="card"
-            style={{ textAlign: "left", cursor: "pointer" }}
+            className="card card-button chain-card"
             onClick={() => navigate(`/chain/${chain.chainKey}`)}
           >
-            <h3 style={{ marginTop: 0 }}>{chain.name}</h3>
-            <div className="small muted">Chain ID {chain.chainId}</div>
-            <div className="small muted">Network {chain.networkType}</div>
+            <div className="chain-card-header">
+              <LogoBadge label={chain.name} src={getChainLogo(chain)} size={44} />
+              <div>
+                <div className="chain-name">{chain.name}</div>
+                <div className="small muted">{chain.networkType.toUpperCase()}</div>
+              </div>
+            </div>
+            <div className="small muted">
+              {chain.networkType.toUpperCase()} · Chain ID {chain.chainId}
+            </div>
           </button>
         ))}
       </div>

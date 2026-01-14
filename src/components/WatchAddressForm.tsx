@@ -1,14 +1,18 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getAddress } from "ethers";
 import { useAccount } from "../runtime/account";
 
-export const WatchAddressForm = () => {
+export const WatchAddressForm = ({ variant = "card" }: { variant?: "card" | "inline" }) => {
   const account = useAccount();
   const [input, setInput] = useState(account.watchAddress ?? "");
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setInput(account.watchAddress ?? "");
+  }, [account.watchAddress]);
 
   const syncAddressToUrl = (address: string | null) => {
     const params = new URLSearchParams(location.search);
@@ -38,23 +42,31 @@ export const WatchAddressForm = () => {
     }
   };
 
+  const formContent = (
+    <div className="flex" style={{ flexDirection: "column", gap: 8 }}>
+      <label className="small muted">Watch address (no wallet required)</label>
+      <input
+        className="input"
+        value={input}
+        onChange={(event) => setInput(event.target.value)}
+        placeholder="0x..."
+      />
+      {error ? <div className="small" style={{ color: "#ff9b9b" }}>{error}</div> : null}
+      <div className="flex">
+        <button className="primary-button" type="submit">
+          {input ? "Save watch address" : "Clear watch address"}
+        </button>
+      </div>
+    </div>
+  );
+
+  if (variant === "inline") {
+    return <form onSubmit={handleSubmit}>{formContent}</form>;
+  }
+
   return (
     <form className="card" onSubmit={handleSubmit}>
-      <div className="flex" style={{ flexDirection: "column", gap: 8 }}>
-        <label className="small muted">Watch address (no wallet required)</label>
-        <input
-          className="input"
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          placeholder="0x..."
-        />
-        {error ? <div className="small" style={{ color: "#ff9b9b" }}>{error}</div> : null}
-        <div className="flex">
-          <button className="primary-button" type="submit">
-            {input ? "Save watch address" : "Clear watch address"}
-          </button>
-        </div>
-      </div>
+      {formContent}
     </form>
   );
 };

@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useBrand } from "../runtime/brand";
 import { useWallet } from "../runtime/wallet";
 import { useAccount } from "../runtime/account";
-import { chains } from "../utils/config";
+import { chains, getChain } from "../utils/config";
 import { SINGLE_CHAIN_KEY } from "../utils/env";
 import { ErrorNotice } from "./ErrorNotice";
 import { normalizeError, type NormalizedError } from "../utils/errors";
+import { ChainSelector } from "./ChainSelector";
+import { AccountModeToggle } from "./AccountModeToggle";
 
 export const Header = () => {
   const { brand } = useBrand();
@@ -29,17 +31,13 @@ export const Header = () => {
     wallet.disconnect();
   };
 
-  const modeLabel = account.mode === "wallet" ? "Wallet connected" : "Watch mode";
-  const modeDetail = account.address ?? "No address";
+  const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
-  const chainOptions = chains.map((chain) => ({
-    value: chain.chainKey,
-    label: chain.name
-  }));
-
-  const activeChainKey = location.pathname.startsWith("/chain/")
-    ? location.pathname.split("/")[2]
-    : SINGLE_CHAIN_KEY || "";
+  const routeChainKey = location.pathname.startsWith("/chain/") ? location.pathname.split("/")[2] : "";
+  const queryChainKey = params.get("chainKey") ?? "";
+  const activeChainKey = routeChainKey || queryChainKey || SINGLE_CHAIN_KEY || "";
+  const selectedChain = activeChainKey ? getChain(activeChainKey) : undefined;
+  const hasSelectedChain = Boolean(activeChainKey);
 
   const activityLink = activeChainKey ? `/chain/${activeChainKey}/activity` : "/";
   const finalizeLink = activeChainKey ? `/chain/${activeChainKey}/finalize` : "/";
@@ -48,9 +46,21 @@ export const Header = () => {
     navigate(`/chain/${value}`);
   };
 
+  const addressLabel = "Active account";
+  const addressValue = account.address
+    ? `${account.mode === "wallet" ? "Wallet" : "Watching"}: ${account.address}`
+    : "No address selected";
+
+  const handleCopy = async () => {
+    if (!account.address) {
+      return;
+    }
+    await navigator.clipboard.writeText(account.address);
+  };
+
   return (
     <header className="container" style={{ paddingBottom: 8 }}>
-      <div className="flex space-between" style={{ alignItems: "center" }}>
+      <div className="flex space-between" style={{ alignItems: "center", gap: 20, flexWrap: "wrap" }}>
         <div className="flex" style={{ gap: 16 }}>
           <img src={`/${brand.assets.logo}`} alt={brand.displayName} style={{ height: 32 }} />
           <div>
@@ -58,25 +68,24 @@ export const Header = () => {
             <div className="muted small">{brand.copy.tagline}</div>
           </div>
         </div>
-        <div className="flex" style={{ gap: 16 }}>
+        <div className="header-controls">
           {SINGLE_CHAIN_KEY ? null : (
-            <select
-              className="input"
-              value={activeChainKey}
-              onChange={(event) => handleChainChange(event.target.value)}
-              style={{ minWidth: 200 }}
-            >
-              <option value="">Select chain</option>
-              {chainOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <ChainSelector chains={chains} activeChainKey={activeChainKey} onChange={handleChainChange} />
           )}
-          <div className="card" style={{ padding: "8px 12px" }}>
-            <div className="small muted">{modeLabel}</div>
-            <div className="small">{modeDetail}</div>
+          <div className="account-stack">
+            <AccountModeToggle mode={account.mode} onChange={account.setMode} compact />
+            <div className="address-card">
+              <div className="small muted">{addressLabel}</div>
+              <div className="address-row">
+                <span className="small">{addressValue}</span>
+                <button className="icon-button" type="button" onClick={handleCopy} disabled={!account.address}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                    <rect x="2" y="2" width="9" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
           {wallet.address ? (
             <button className="secondary-button" onClick={handleDisconnect}>
@@ -90,13 +99,20 @@ export const Header = () => {
         </div>
       </div>
       {connectError ? <ErrorNotice error={connectError} variant="banner" /> : null}
-      <nav className="flex" style={{ gap: 16, marginTop: 12 }}>
-        <NavLink to="/" end>
-          Home
-        </NavLink>
-        <NavLink to={activityLink}>Activity</NavLink>
-        <NavLink to={finalizeLink}>Finalize</NavLink>
-      </nav>
+      {SINGLE_CHAIN_KEY || hasSelectedChain ? (
+        <nav className="flex" style={{ gap: 16, marginTop: 12 }}>
+          <NavLink to="/" end>
+            Home
+          </NavLink>
+          <NavLink to={activityLink}>Activity</NavLink>
+          <NavLink to={finalizeLink}>Finalize</NavLink>
+        </nav>
+      ) : null}
+      {!SINGLE_CHAIN_KEY && selectedChain ? (
+        <div className="banner" style={{ marginTop: 12 }}>
+          You are on <strong>{selectedChain.name}</strong>.
+        </div>
+      ) : null}
     </header>
   );
 };

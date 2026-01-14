@@ -427,6 +427,7 @@ export const FinalizePage = () => {
         token: "N/A",
         amount: "0",
         txHash: finalizeTxHash,
+        withdrawalTxHash: selectedTxHash,
         explorerUrl,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -777,7 +778,7 @@ export const FinalizePage = () => {
         ) : null}
         {networkError ? <ErrorNotice error={networkError} variant="banner" /> : null}
         {account.isWatchMode ? (
-          <div className="banner warning">Connect a wallet to finalize this withdrawal.</div>
+          <div className="banner warning">Switch to Wallet mode to finalize this withdrawal.</div>
         ) : null}
         <button
           className="primary-button"

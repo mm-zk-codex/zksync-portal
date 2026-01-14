@@ -53,6 +53,21 @@ Minimal assets required:
 - `favicon.svg`
 - `background.svg`
 
+## Chain & token logos
+
+Chain logos live in `src/assets/chains/` and should be named `chain-<chainKey>.svg` (use `config/chains.json` for keys).
+Token logos live in `src/assets/tokens/` and should be named `token-<SYMBOL>.svg`.
+
+To wire a token logo, set `logoURI` in `config/tokens.json` to a relative path like:
+
+```json
+{
+  "logoURI": "assets/tokens/token-ETH.svg"
+}
+```
+
+If a logo is missing, the UI falls back to a generated badge using the chain or token initials.
+
 ## Known limitations
 
 See `docs/MVP_LIMITATIONS.md` for RPC-only history constraints and withdrawal readiness details.

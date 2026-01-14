@@ -6,6 +6,7 @@ export type StoredTx = {
   token: string;
   amount: string;
   txHash: string;
+  withdrawalTxHash?: string;
   explorerUrl?: string;
   createdAt: number;
   updatedAt: number;

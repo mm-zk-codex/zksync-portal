@@ -1,0 +1,15 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="atlas-gradient" x1="12" y1="0" x2="116" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22D3EE" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#atlas-gradient)" />
+  <rect x="28" y="28" width="72" height="72" rx="18" fill="rgba(0,0,0,0.18)" />
+  <path
+    d="M64 38L84 90H74L69 78H59L54 90H44L64 38ZM64 58L60.2 70H67.8L64 58Z"
+    fill="white"
+    fill-opacity="0.92"
+  />
+</svg>
