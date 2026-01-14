@@ -15,9 +15,6 @@ export const useSyncWatchAddress = () => {
         if (checksum !== account.watchAddress) {
           account.setWatchAddress(checksum);
         }
-        if (account.mode !== "watch") {
-          account.setMode("watch");
-        }
       } catch {
         return;
       }

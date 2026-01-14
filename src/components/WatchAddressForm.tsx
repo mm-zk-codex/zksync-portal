@@ -10,6 +10,10 @@ export const WatchAddressForm = ({ variant = "card" }: { variant?: "card" | "inl
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setInput(account.watchAddress ?? "");
+  }, [account.watchAddress]);
+
   const syncAddressToUrl = (address: string | null) => {
     const params = new URLSearchParams(location.search);
     if (address) {
@@ -66,6 +70,3 @@ export const WatchAddressForm = ({ variant = "card" }: { variant?: "card" | "inl
     </form>
   );
 };
-  useEffect(() => {
-    setInput(account.watchAddress ?? "");
-  }, [account.watchAddress]);
