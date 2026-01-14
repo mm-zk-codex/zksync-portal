@@ -16,19 +16,21 @@
         "minItems": 1,
         "items": {
           "type": "object",
-          "required": [
-            "symbol",
-            "name",
-            "decimals",
-            "address",
-            "isNative",
-            "enabled"
-          ],
+          "required": ["symbol", "name", "decimals", "isNative", "enabled"],
           "properties": {
             "symbol": { "type": "string" },
             "name": { "type": "string" },
             "decimals": { "type": "integer", "minimum": 0 },
             "address": {
+              "type": ["string", "null"],
+              "pattern": "^0x[a-fA-F0-9]{40}$",
+              "description": "Legacy field (treated as l2Address)."
+            },
+            "l1Address": {
+              "type": ["string", "null"],
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            },
+            "l2Address": {
               "type": ["string", "null"],
               "pattern": "^0x[a-fA-F0-9]{40}$"
             },

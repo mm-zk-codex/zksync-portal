@@ -43,6 +43,17 @@ export const DepositPage = () => {
   const [submitError, setSubmitError] = useState<NormalizedError | null>(null);
   const [networkError, setNetworkError] = useState<NormalizedError | null>(null);
   const [needsChainAdd, setNeedsChainAdd] = useState(false);
+  const [balanceRefresh, setBalanceRefresh] = useState(0);
+  const [nativeBalance, setNativeBalance] = useState<{
+    status: "idle" | "loading" | "ready" | "error";
+    value?: bigint;
+    error?: NormalizedError;
+  }>({ status: "idle" });
+  const [tokenBalance, setTokenBalance] = useState<{
+    status: "idle" | "loading" | "ready" | "error";
+    value?: bigint;
+    error?: NormalizedError;
+  }>({ status: "idle" });
   const isAmountValid = token ? isValidAmount(amount, token.decimals) : false;
 
   useEffect(() => {
@@ -77,6 +88,100 @@ export const DepositPage = () => {
     }
     return `${whole}.${fraction.slice(0, 6)}`.replace(/\.$/, "");
   };
+
+  const renderBalanceValue = (
+    balance: {
+      status: "idle" | "loading" | "ready" | "error";
+      value?: bigint;
+    },
+    decimals: number
+  ) => {
+    if (balance.status === "loading") {
+      return "Loading...";
+    }
+    if (balance.status === "ready" && balance.value !== undefined) {
+      return formatDisplayAmount(balance.value, decimals);
+    }
+    if (balance.status === "error") {
+      return "Unavailable";
+    }
+    return "--";
+  };
+
+  useEffect(() => {
+    let isActive = true;
+    const fetchBalances = async () => {
+      if (!l1Provider || !account.address || !token) {
+        if (isActive) {
+          setNativeBalance({ status: "idle" });
+          setTokenBalance({ status: "idle" });
+        }
+        return;
+      }
+      setNativeBalance({ status: "loading" });
+      setTokenBalance({ status: "loading" });
+      try {
+        const nativeValue = await l1Provider.getBalance(account.address);
+        if (isActive) {
+          setNativeBalance({ status: "ready", value: nativeValue });
+          if (token.isNative) {
+            setTokenBalance({ status: "ready", value: nativeValue });
+          }
+        }
+      } catch (error) {
+        if (isActive) {
+          setNativeBalance({
+            status: "error",
+            error: normalizeError(error, {
+              action: "Fetch balance",
+              chainKey: chain?.chainKey,
+              rpcUrl: chain?.l1RpcUrls[0]
+            })
+          });
+        }
+      }
+      if (token.isNative) {
+        return;
+      }
+      if (!token.l1Address) {
+        if (isActive) {
+          setTokenBalance({
+            status: "error",
+            error: createNormalizedError({
+              title: "Token config missing L1 address",
+              message: "This token is missing its L1 address, so balance lookups are unavailable.",
+              category: "CONFIG_ERROR",
+              context: { chainKey: chain?.chainKey, token: token.symbol }
+            })
+          });
+        }
+        return;
+      }
+      try {
+        const contract = new Contract(token.l1Address, erc20Abi, l1Provider);
+        const tokenValue = (await contract.balanceOf(account.address)) as bigint;
+        if (isActive) {
+          setTokenBalance({ status: "ready", value: tokenValue });
+        }
+      } catch (error) {
+        if (isActive) {
+          setTokenBalance({
+            status: "error",
+            error: normalizeError(error, {
+              action: "Fetch token balance",
+              chainKey: chain?.chainKey,
+              rpcUrl: chain?.l1RpcUrls[0],
+              token: token.symbol
+            })
+          });
+        }
+      }
+    };
+    fetchBalances();
+    return () => {
+      isActive = false;
+    };
+  }, [account.address, chain?.chainKey, chain?.l1RpcUrls, l1Provider, token, balanceRefresh]);
 
   const runPreflight = async () => {
     if (!chain || !token || !wallet.signer || !l1Provider) {
@@ -130,8 +235,8 @@ export const DepositPage = () => {
           );
           return false;
         }
-      } else if (token.address) {
-        const contract = new Contract(token.address, erc20Abi, l1Provider);
+      } else if (token.l1Address) {
+        const contract = new Contract(token.l1Address, erc20Abi, l1Provider);
         const balance = (await contract.balanceOf(address)) as bigint;
         if (balance < value) {
           const have = formatDisplayAmount(balance, token.decimals);
@@ -193,7 +298,7 @@ export const DepositPage = () => {
   };
 
   const checkAllowance = async () => {
-    if (!wallet.signer || !token || !chain || token.isNative || !token.address) {
+    if (!wallet.signer || !token || !chain || token.isNative || !token.l1Address) {
       setApprovalNeeded(false);
       setApprovalInfo(null);
       setApprovalError(null);
@@ -205,7 +310,7 @@ export const DepositPage = () => {
       return;
     }
     try {
-      const contract = new Contract(token.address, erc20Abi, wallet.signer);
+      const contract = new Contract(token.l1Address!, erc20Abi, wallet.signer);
       const owner = await wallet.signer.getAddress();
       const allowance = (await contract.allowance(owner, chain.contracts.l1Bridge)) as bigint;
       const needed = parseAmount(amount || "0", token.decimals);
@@ -236,7 +341,7 @@ export const DepositPage = () => {
     if (isWalletConnected && amount && token && !token.isNative) {
       checkAllowance();
     }
-  }, [amount, token?.address, isWalletConnected, amountValidation, chain?.chainKey]);
+  }, [amount, token?.l1Address, isWalletConnected, amountValidation, chain?.chainKey]);
 
   if (!chain || !token) {
     return (
@@ -247,13 +352,13 @@ export const DepositPage = () => {
   }
 
   const submitApprove = async () => {
-    if (!wallet.signer || !token?.address) {
+    if (!wallet.signer || !token?.l1Address) {
       return;
     }
     setSubmitError(null);
     setStatus("Submitting approval...");
     try {
-      const contract = new Contract(token.address, erc20Abi, wallet.signer);
+      const contract = new Contract(token.l1Address, erc20Abi, wallet.signer);
       const needed = parseAmount(amount || "0", token.decimals);
       const txResponse = await contract.approve(chain.contracts.l1Bridge, needed);
       await txResponse.wait();
@@ -286,7 +391,7 @@ export const DepositPage = () => {
       const sdk = createSdk({ l1Provider: l1Provider!, l2Provider: l2Provider!, signer: wallet.signer });
       const value = parseAmount(amount, token.decimals);
       const createResult = await sdk.deposits.tryCreate({
-        token: token.isNative ? ETH_ADDRESS : token.address!,
+        token: token.isNative ? ETH_ADDRESS : token.l1Address!,
         amount: value,
         to: (account.address ?? undefined) as string | undefined
       });
@@ -315,6 +420,7 @@ export const DepositPage = () => {
         updateStoredTxStatus(stored.id, "confirmed");
         setTx({ ...stored, status: "confirmed" });
         setStatus("Deposit confirmed on L1.");
+        setBalanceRefresh((value) => value + 1);
       }
     } catch (error) {
       setStatus(null);
@@ -355,6 +461,21 @@ export const DepositPage = () => {
             </option>
           ))}
         </select>
+        <div style={{ marginTop: 12 }}>
+          <div className="small muted">Balances</div>
+          <div className="flex" style={{ gap: 24, flexWrap: "wrap" }}>
+            <div>
+              <div className="small muted">Native</div>
+              <div>{renderBalanceValue(nativeBalance, chain.nativeCurrency.decimals)}</div>
+            </div>
+            <div>
+              <div className="small muted">{token.symbol}</div>
+              <div>{renderBalanceValue(tokenBalance, token.decimals)}</div>
+            </div>
+          </div>
+          {nativeBalance.error ? <ErrorNotice error={nativeBalance.error} variant="inline" /> : null}
+          {tokenBalance.error ? <ErrorNotice error={tokenBalance.error} variant="inline" /> : null}
+        </div>
         <label className="small muted" style={{ marginTop: 12, display: "block" }}>
           Amount
         </label>

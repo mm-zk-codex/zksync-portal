@@ -68,7 +68,8 @@ const sampleTokens = [
         symbol: "ETH",
         name: "Ether",
         decimals: 18,
-        address: null,
+        l1Address: null,
+        l2Address: null,
         isNative: true,
         enabled: true
       }

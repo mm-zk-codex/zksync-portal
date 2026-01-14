@@ -15,7 +15,7 @@ This document defines the canonical routes, query parameters, and deep-link beha
 
 ### Query Param Definitions
 - `chainKey`: **Stable string identifier** from config (not just `chainId`).
-- `token`: Token symbol or token address (symbol preferred when configured).  
+- `token`: Token symbol or **L2** token address (symbol preferred when configured).  
 - `amount`: Decimal amount string (no separators).  
 - `address`: Watch address (0x...) for **watch-address mode**.  
 - `txHash`: Transaction hash for withdrawal finalization.  
