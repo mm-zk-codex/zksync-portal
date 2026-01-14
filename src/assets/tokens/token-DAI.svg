@@ -1,0 +1,12 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dai-gradient" x1="20" y1="8" x2="108" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="60" fill="url(#dai-gradient)" />
+  <rect x="36" y="52" width="56" height="8" rx="4" fill="white" fill-opacity="0.85" />
+  <rect x="36" y="68" width="56" height="8" rx="4" fill="white" fill-opacity="0.85" />
+  <path d="M46 38H60C74 38 82 48 82 64C82 80 74 90 60 90H46V38Z" fill="white" fill-opacity="0.95" />
+</svg>

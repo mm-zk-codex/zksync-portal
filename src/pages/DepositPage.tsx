@@ -5,6 +5,7 @@ import { ETH_ADDRESS } from "@matterlabs/zksync-js/core";
 import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { ErrorNotice } from "../components/ErrorNotice";
+import { TokenSelect } from "../components/TokenSelect";
 import { TxStatusCard } from "../components/TxStatusCard";
 import { useAccount } from "../runtime/account";
 import { useWallet } from "../runtime/wallet";
@@ -61,7 +62,8 @@ export const DepositPage = () => {
   }, [searchParams]);
 
   const isReady = chain && token && l2Provider && l1Provider;
-  const isWalletConnected = !!wallet.signer;
+  const isWalletConnected = !!wallet.signer && account.mode === "wallet";
+  const isWatchMode = account.mode === "watch";
   const isChainMismatch = wallet.chainId ? wallet.chainId !== chain?.l1ChainId : false;
   const amountValidation = token ? getAmountError(amount, token.decimals, { allowEmpty: true }) : null;
   const amountValidationError = amountValidation
@@ -446,21 +448,15 @@ export const DepositPage = () => {
           <CopyLinkButton />
         </div>
         <label className="small muted">Token</label>
-        <select
-          className="input"
+        <TokenSelect
+          tokens={tokens}
           value={token.symbol}
-          onChange={(event) => {
+          onChange={(symbol) => {
             const params = new URLSearchParams(location.search);
-            params.set("token", event.target.value);
+            params.set("token", symbol);
             navigate(`${location.pathname}?${params.toString()}`, { replace: true });
           }}
-        >
-          {tokens.map((item) => (
-            <option key={item.symbol} value={item.symbol}>
-              {item.symbol}
-            </option>
-          ))}
-        </select>
+        />
         <div style={{ marginTop: 12 }}>
           <div className="small muted">Balances</div>
           <div className="flex" style={{ gap: 24, flexWrap: "wrap" }}>
@@ -495,7 +491,8 @@ export const DepositPage = () => {
           </div>
         ) : null}
         {networkError ? <ErrorNotice error={networkError} variant="banner" /> : null}
-        {!isWalletConnected ? (
+        {isWatchMode ? <div className="banner warning">Switch to Wallet mode to submit a deposit.</div> : null}
+        {!isWalletConnected && !isWatchMode ? (
           <div className="banner warning">Connect a wallet to submit a deposit.</div>
         ) : null}
         <div className="link-row" style={{ marginTop: 12 }}>
@@ -503,7 +500,7 @@ export const DepositPage = () => {
             <button
               className="secondary-button"
               onClick={submitApprove}
-              disabled={!isAmountValid || isChainMismatch || !!displayInlineError}
+              disabled={!isAmountValid || isChainMismatch || !!displayInlineError || !isWalletConnected || isWatchMode}
             >
               Approve
             </button>
@@ -511,7 +508,14 @@ export const DepositPage = () => {
           <button
             className="primary-button"
             onClick={submitDeposit}
-            disabled={!isAmountValid || isChainMismatch || !isWalletConnected || approvalNeeded || !!displayInlineError}
+            disabled={
+              !isAmountValid ||
+              isChainMismatch ||
+              !isWalletConnected ||
+              approvalNeeded ||
+              !!displayInlineError ||
+              isWatchMode
+            }
           >
             Deposit
           </button>

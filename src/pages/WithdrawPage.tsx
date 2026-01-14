@@ -5,6 +5,7 @@ import { ETH_ADDRESS } from "@matterlabs/zksync-js/core";
 import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { ErrorNotice } from "../components/ErrorNotice";
+import { TokenSelect } from "../components/TokenSelect";
 import { TxStatusCard } from "../components/TxStatusCard";
 import { useAccount } from "../runtime/account";
 import { useWallet } from "../runtime/wallet";
@@ -58,7 +59,8 @@ export const WithdrawPage = () => {
   }, [searchParams]);
 
   const isReady = chain && token && l2Provider && l1Provider;
-  const isWalletConnected = !!wallet.signer;
+  const isWalletConnected = !!wallet.signer && account.mode === "wallet";
+  const isWatchMode = account.mode === "watch";
   const isChainMismatch = wallet.chainId ? wallet.chainId !== chain?.chainId : false;
   const canAutoAddChain = !!(chain?.nativeCurrency && chain.rpcUrls.length && chain.explorerUrls.length);
   const amountValidation = token ? getAmountError(amount, token.decimals, { allowEmpty: true }) : null;
@@ -396,21 +398,15 @@ export const WithdrawPage = () => {
           <CopyLinkButton />
         </div>
         <label className="small muted">Token</label>
-        <select
-          className="input"
+        <TokenSelect
+          tokens={tokens}
           value={token.symbol}
-          onChange={(event) => {
+          onChange={(symbol) => {
             const params = new URLSearchParams(location.search);
-            params.set("token", event.target.value);
+            params.set("token", symbol);
             navigate(`${location.pathname}?${params.toString()}`, { replace: true });
           }}
-        >
-          {tokens.map((item) => (
-            <option key={item.symbol} value={item.symbol}>
-              {item.symbol}
-            </option>
-          ))}
-        </select>
+        />
         <div style={{ marginTop: 12 }}>
           <div className="small muted">Balances</div>
           <div className="flex" style={{ gap: 24, flexWrap: "wrap" }}>
@@ -454,14 +450,15 @@ export const WithdrawPage = () => {
           </div>
         ) : null}
         {networkError ? <ErrorNotice error={networkError} variant="banner" /> : null}
-        {!isWalletConnected ? (
+        {isWatchMode ? <div className="banner warning">Switch to Wallet mode to submit a withdrawal.</div> : null}
+        {!isWalletConnected && !isWatchMode ? (
           <div className="banner warning">Connect a wallet to submit a withdrawal.</div>
         ) : null}
         <div className="link-row" style={{ marginTop: 12 }}>
           <button
             className="primary-button"
             onClick={submitWithdraw}
-            disabled={!isAmountValid || isChainMismatch || !isWalletConnected || !!displayInlineError}
+            disabled={!isAmountValid || isChainMismatch || !isWalletConnected || !!displayInlineError || isWatchMode}
           >
             Withdraw
           </button>

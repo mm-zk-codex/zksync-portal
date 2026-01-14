@@ -74,6 +74,7 @@ select option {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 20px;
+  box-shadow: 0 12px 30px rgba(5, 8, 24, 0.25);
 }
 
 .grid {
@@ -107,6 +108,9 @@ select option {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .primary-button:disabled {
@@ -121,6 +125,13 @@ select option {
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+button:active {
+  transform: translateY(1px);
 }
 
 .input {
@@ -220,4 +231,291 @@ select option {
 nav a.active {
   color: var(--color-primary, #5b65f5);
   font-weight: 600;
+}
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.account-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.address-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.address-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.logo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(91, 101, 245, 0.35), rgba(20, 184, 166, 0.35));
+  color: var(--surfaceText);
+  font-weight: 700;
+  text-transform: uppercase;
+  overflow: hidden;
+}
+
+.logo-badge.circle {
+  border-radius: 999px;
+}
+
+.logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-badge span {
+  font-size: 12px;
+}
+
+.card-button {
+  text-align: left;
+  cursor: pointer;
+}
+
+.card-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 16px 40px rgba(5, 8, 24, 0.35);
+}
+
+.card-button:active {
+  transform: translateY(2px);
+}
+
+.chain-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(91, 101, 245, 0.15), rgba(20, 184, 166, 0.1)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.chain-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(5, 8, 24, 0.15) 0%, rgba(5, 8, 24, 0.45) 100%);
+  pointer-events: none;
+}
+
+.chain-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.chain-card-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.chain-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--surfaceText);
+}
+
+.token-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.select {
+  position: relative;
+}
+
+.chain-selector {
+  min-width: 220px;
+}
+
+.token-select {
+  width: 100%;
+}
+
+.select summary {
+  list-style: none;
+}
+
+.select summary::-webkit-details-marker {
+  display: none;
+}
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--surfaceText);
+  cursor: pointer;
+}
+
+.select-trigger:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.select-text {
+  flex: 1;
+}
+
+.select-title {
+  font-weight: 600;
+}
+
+.select-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 20px 40px rgba(5, 8, 24, 0.4);
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.select-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.segmented-control {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.segmented-control button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--surfaceText);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.segmented-control button.active {
+  background: rgba(91, 101, 245, 0.3);
+  color: white;
+}
+
+.segmented-control.compact button {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.activity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.activity-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.activity-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 8px 0;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  animation: spin 0.8s linear infinite;
+  margin-right: 6px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 720px) {
+  .header-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .account-stack {
+    width: 100%;
+  }
+
+  .select-menu {
+    position: static;
+    margin-top: 8px;
+  }
 }

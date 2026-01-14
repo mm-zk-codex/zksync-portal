@@ -1,0 +1,15 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="zkos-gradient" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B65F5" />
+      <stop offset="100%" stop-color="#9A6CFF" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#zkos-gradient)" />
+  <circle cx="96" cy="32" r="18" fill="rgba(255,255,255,0.2)" />
+  <path
+    d="M40 44H88L72 64L88 84H40L56 64L40 44Z"
+    fill="white"
+    fill-opacity="0.9"
+  />
+</svg>

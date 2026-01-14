@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { getAddress } from "ethers";
 import { useWallet } from "./wallet";
 
-type AccountMode = "wallet" | "watch";
+export type AccountMode = "wallet" | "watch";
 
 type AccountState = {
   mode: AccountMode;
@@ -11,15 +11,18 @@ type AccountState = {
   setWatchAddress: (address: string | null) => void;
   clearWatchAddress: () => void;
   isWatchMode: boolean;
+  setMode: (mode: AccountMode) => void;
 };
 
 const STORAGE_KEY = "atlas_watch_address";
+const MODE_STORAGE_KEY = "atlas_account_mode";
 
 const AccountContext = createContext<AccountState | undefined>(undefined);
 
 export const AccountProvider = ({ children }: { children: React.ReactNode }) => {
   const wallet = useWallet();
   const [watchAddress, setWatchAddressState] = useState<string | null>(null);
+  const [mode, setModeState] = useState<AccountMode>("watch");
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -28,6 +31,10 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (stored) {
       setWatchAddressState(stored);
+    }
+    const storedMode = window.localStorage.getItem(MODE_STORAGE_KEY) as AccountMode | null;
+    if (storedMode === "wallet" || storedMode === "watch") {
+      setModeState(storedMode);
     }
   }, []);
 
@@ -44,8 +51,20 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
 
   const clearWatchAddress = () => setWatchAddress(null);
 
-  const mode: AccountMode = wallet.address ? "wallet" : watchAddress ? "watch" : "watch";
-  const address = wallet.address ?? watchAddress;
+  useEffect(() => {
+    if (!wallet.address && mode === "wallet") {
+      setModeState("watch");
+    }
+  }, [wallet.address, mode]);
+
+  const setMode = (nextMode: AccountMode) => {
+    setModeState(nextMode);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(MODE_STORAGE_KEY, nextMode);
+    }
+  };
+
+  const address = mode === "wallet" ? wallet.address : watchAddress;
 
   const value = useMemo(
     () => ({
@@ -54,7 +73,8 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       watchAddress,
       setWatchAddress,
       clearWatchAddress,
-      isWatchMode: mode === "watch"
+      isWatchMode: mode === "watch",
+      setMode
     }),
     [mode, address, watchAddress]
   );

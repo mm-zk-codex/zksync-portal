@@ -1,0 +1,16 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="usdc-gradient" x1="12" y1="12" x2="116" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="60" fill="url(#usdc-gradient)" />
+  <circle cx="64" cy="64" r="38" stroke="white" stroke-opacity="0.85" stroke-width="6" />
+  <path
+    d="M64 38C56 38 50 43 50 50C50 58 56 62 64 64C72 66 78 70 78 78C78 86 72 90 64 90C56 90 50 85 50 78"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+  />
+</svg>
