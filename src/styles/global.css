@@ -4,6 +4,10 @@
   font-weight: 400;
   color: var(--color-text, #ffffff);
   background-color: var(--color-background, #0b0d17);
+  --surface: color-mix(in srgb, var(--color-background, #0b0d17) 86%, #ffffff 14%);
+  --surfaceText: var(--color-text, #ffffff);
+  --border: color-mix(in srgb, var(--color-text, #ffffff) 18%, transparent);
+  --mutedText: var(--color-muted, #9aa0b4);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -33,6 +37,23 @@ input,
 select {
   font-family: inherit;
   color: inherit;
+}
+
+select {
+  background: var(--surface);
+  color: var(--surfaceText);
+  border: 1px solid var(--border);
+}
+
+select.input {
+  background: var(--surface);
+  color: var(--surfaceText);
+  border: 1px solid var(--border);
+}
+
+select option {
+  background: var(--surface);
+  color: var(--surfaceText);
 }
 
 .app {
@@ -75,7 +96,7 @@ select {
 }
 
 .muted {
-  color: var(--color-muted, #9aa0b4);
+  color: var(--mutedText, #9aa0b4);
 }
 
 .primary-button {
@@ -108,6 +129,53 @@ select {
   border-radius: 8px;
   padding: 10px 12px;
   width: 100%;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-primary, #5b65f5);
+  outline-offset: 2px;
+}
+
+.error-box {
+  border-radius: 10px;
+  border: 1px solid rgba(245, 130, 91, 0.5);
+  background: rgba(245, 130, 91, 0.12);
+  color: var(--surfaceText);
+  padding: 10px 12px;
+}
+
+.error-box.inline {
+  margin-top: 8px;
+}
+
+.error-box.banner {
+  margin-top: 12px;
+}
+
+.error-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.error-box details {
+  margin-top: 8px;
+}
+
+.error-box summary {
+  cursor: pointer;
+  color: var(--surfaceText);
+}
+
+.error-box pre {
+  white-space: pre-wrap;
+  margin-top: 8px;
+}
+
+.secondary-button.small {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  margin-top: 8px;
 }
 
 .badge {

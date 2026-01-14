@@ -31,6 +31,11 @@ export type ChainConfig = {
   networkType: "mainnet" | "testnet";
   rpcUrls: string[];
   explorerUrls: string[];
+  nativeCurrency: {
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
   l1ChainId: number;
   l1RpcUrls: string[];
   contracts: {

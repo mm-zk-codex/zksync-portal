@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { ChainBanner } from "../components/ChainBanner";
 import { CopyLinkButton } from "../components/CopyLinkButton";
+import { ErrorNotice } from "../components/ErrorNotice";
 import { TxStatusCard } from "../components/TxStatusCard";
 import { useAccount } from "../runtime/account";
 import { useChainProviders } from "../runtime/useChainProviders";
@@ -9,6 +10,7 @@ import { useSyncWatchAddress } from "../runtime/useSyncWatchAddress";
 import { getChain } from "../utils/config";
 import { getStoredTxs } from "../storage/txStore";
 import { getExplorerTxUrl } from "../runtime/chainRuntime";
+import { normalizeError, type NormalizedError } from "../utils/errors";
 
 export const ActivityPage = () => {
   const { chainKey } = useParams();
@@ -16,9 +18,10 @@ export const ActivityPage = () => {
   const account = useAccount();
   useSyncWatchAddress();
   const chain = chainKey ? getChain(chainKey) : undefined;
-  const { l2Provider, isDegraded } = useChainProviders(chain);
+  const { l2Provider, isDegraded, rpcUrl } = useChainProviders(chain);
   const [history, setHistory] = useState<{ hash: string; status?: number }[]>([]);
   const [status, setStatus] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState<NormalizedError | null>(null);
   const [limit, setLimit] = useState(5);
 
   const address = searchParams.get("address") ?? account.address ?? "";
@@ -39,8 +42,17 @@ export const ActivityPage = () => {
       const items = await anyProvider.getHistory(address);
       setHistory(items.slice(0, limit));
       setStatus(null);
+      setStatusError(null);
     } catch (error) {
-      setStatus(`Unable to fetch history: ${(error as Error).message}`);
+      setStatus("Unable to fetch history.");
+      setStatusError(
+        normalizeError(error, {
+          action: "Fetch history",
+          chainKey: chain?.chainKey,
+          rpcUrl,
+          address
+        })
+      );
     }
   };
 
@@ -81,6 +93,7 @@ export const ActivityPage = () => {
           </button>
         </div>
         {status ? <div className="small muted" style={{ marginTop: 12 }}>{status}</div> : null}
+        {statusError ? <ErrorNotice error={statusError} variant="banner" /> : null}
       </div>
       <div className="grid" style={{ marginTop: 16 }}>
         {storedTxs.map((tx) => (

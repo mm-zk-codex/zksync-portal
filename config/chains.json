@@ -10,6 +10,11 @@
     "explorerUrls": [
       "https://explorer.abstract.example.org"
     ],
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
     "l1ChainId": 31337,
     "l1RpcUrls": [
       "http://localhost:8545"
@@ -43,6 +48,11 @@
     "explorerUrls": [
       "https://explorer.atlas-testnet.example.org"
     ],
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
     "l1ChainId": 31337,
     "l1RpcUrls": [
       "http://localhost:8545"
